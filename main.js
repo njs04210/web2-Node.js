@@ -93,11 +93,14 @@ var app = http.createServer(function(request,response){
         var post = qs.parse(body);
         var title = post.title;
         var description = post.description;
+        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
+          response.writeHead(302, {Location: `/?id=${title}`});
+          response.end();
+        }) //err 에러가 있을경우 에러를 처리하는 방법을 제공.
+        //콜백이 실행된다는 것은 파일이 저장이 끝났다는 얘기. 그 다음 success해주는 코드
         //console.log(post.title);
     });
 
-    response.writeHead(200);
-    response.end('success');
 
 
   } else { //이도저도 아닌것은 404 로 처리
