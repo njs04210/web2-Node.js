@@ -147,17 +147,23 @@ var app = http.createServer(function(request,response){
             response.writeHead(302, {Location: `/?id=${title}`});
             response.end();
           })
-        })
-        console.log(post);
-
-        /*
-        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
-          response.writeHead(302, {Location: `/?id=${title}`});
+        });
+    });
+  } else if(pathname === '/delete_process') {
+    var body ='';
+    request.on('data', function(data) {
+        body = body + data;
+    });
+    //request쓰는이유 : 사용자가 요청한 정보안에 post가 있을테니까.
+    request.on('end', function(){
+        var post = qs.parse(body);
+        var id = post.id;
+        fs.unlink(`data/${id}`, function(error) {
+          response.writeHead(302, {Location: `/`}); //삭제하면 홈으로 보내버리게끔 
           response.end();
         })
-        */
     });
-  }else { //이도저도 아닌것은 404 로 처리
+  } else { //이도저도 아닌것은 404 로 처리
       response.writeHead(404);
       response.end('Not found');
     }
