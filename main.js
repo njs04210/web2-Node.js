@@ -100,7 +100,7 @@ var app = http.createServer(function(request,response){
         //콜백이 실행된다는 것은 파일이 저장이 끝났다는 얘기. 그 다음 success해주는 코드
         //console.log(post.title);
     });
-
+    //update를 눌렀을 때
   } else if(pathname === '/update'){
       fs.readdir('./data', function(error, filelist){
       fs.readFile(`data/${queryData.id}`, 'utf8', (err, description) => {
@@ -124,7 +124,33 @@ var app = http.createServer(function(request,response){
         response.end(template);
       });
     });
-  } else { //이도저도 아닌것은 404 로 처리
+  } else if(pathname === '/update_process') {
+    var body ='';
+    request.on('data', function(data) {
+        body = body + data;
+    });
+    //request쓰는이유 : 사용자가 요청한 정보안에 post가 있을테니까.
+    request.on('end', function(){
+        var post = qs.parse(body);
+        var id = post.id;
+        var title = post.title;
+        var description = post.description;
+        fs.rename(`data/${id}`, `data/${title}`, function(error) {
+          fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
+            response.writeHead(302, {Location: `/?id=${title}`});
+            response.end();
+          })
+        })
+        console.log(post);
+
+        /*
+        fs.writeFile(`data/${title}`, description, 'utf8', function(err) {
+          response.writeHead(302, {Location: `/?id=${title}`});
+          response.end();
+        })
+        */
+    });
+  }else { //이도저도 아닌것은 404 로 처리
       response.writeHead(404);
       response.end('Not found');
     }
