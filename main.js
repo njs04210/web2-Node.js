@@ -69,7 +69,7 @@ var app = http.createServer(function(request,response){
       var title = "WEB - create";
       var list = templateList(filelist);
       var template = templateHTML(title, list, `
-        <form action="http://localhost:3000/create_process" method="post">
+        <form action="/create_process" method="post">
           <p><input type="text" name="title" placeholder="title"></p>
           <p>
             <textarea name="description" placeholder="description"></textarea>
@@ -101,8 +101,29 @@ var app = http.createServer(function(request,response){
         //console.log(post.title);
     });
 
-
-
+  } else if(pathname === '/update'){
+      fs.readdir('./data', function(error, filelist){
+      fs.readFile(`data/${queryData.id}`, 'utf8', (err, description) => {
+        var title = queryData.id;
+        var list = templateList(filelist);
+        var template = templateHTML(title, list,
+          `
+          <form action="/update_process" method="post">
+            <input type="hidden" name="id" value="${title}">
+            <p><input type="text" name="title" placeholder="title" value = "${title}"></p>
+            <p>
+              <textarea name="description" placeholder="description">${description}</textarea>
+            </p>
+            <p>
+              <input type="submit">
+            </p>
+          </form>
+          `,
+          `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`);
+        response.writeHead(200);
+        response.end(template);
+      });
+    });
   } else { //이도저도 아닌것은 404 로 처리
       response.writeHead(404);
       response.end('Not found');
